@@ -1,5 +1,6 @@
 package fr.istic.evc.server.abstraction;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 public class VirtualReality implements IVirtualRealityServer {
@@ -12,8 +13,18 @@ public class VirtualReality implements IVirtualRealityServer {
 	
 	@Override
 	public void addObject(IVirtualObjectServer object) {
-		object.setId(listObjects.size());
+		try {
+			System.out.println("SERVEUR : VirtualReality : Set Id Cube : "+listObjects.size());
+			object.setId(listObjects.size());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
 		this.listObjects.add(object);
+		
 	}
-
+	
+	public ArrayList<IVirtualObjectServer> getList() {
+		return listObjects;
+	}
 }

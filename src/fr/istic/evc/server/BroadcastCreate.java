@@ -1,5 +1,6 @@
 package fr.istic.evc.server;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -12,7 +13,7 @@ import java.rmi.RemoteException;
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
 
-public class BroadcastUpdates implements Serializable {
+public class BroadcastCreate implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private int portDiffusion ;
@@ -25,7 +26,7 @@ public class BroadcastUpdates implements Serializable {
 	private InetAddress adresseDiffusion ;
 	private transient MulticastSocket socketDiffusion ;
 
-	public BroadcastUpdates (final String ng, final int portDiffusion)
+	public BroadcastCreate (final String ng, final int portDiffusion)
 			throws RemoteException {
 		this.portDiffusion = portDiffusion ;
 		nomGroupe = ng ;
@@ -45,13 +46,16 @@ public class BroadcastUpdates implements Serializable {
 		System.out.println ("socket : " + socketDiffusion.getLocalPort() + " " + socketDiffusion.getInetAddress ()) ;
 	}
 
-	public void diffuseMessage (int id, Vector3d p, Quat4d r) {
-		System.out.println("SERVEUR : BroadcastUpdates : Envoi message :\nid : "+id+"\nvecteur : "+p+"\nquat4d : "+r);
+	public void diffuseMessage (int id, String name, float size, Color c, Vector3d p, Quat4d r) {
+		System.out.println("SERVEUR : BroadcastCreate : Envoi du message");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream () ;
 		ObjectOutputStream oos ;
 		try {
 			oos = new ObjectOutputStream (baos) ;
 			oos.writeObject (id) ;
+			oos.writeObject (name) ;
+			oos.writeObject (size) ;
+			oos.writeObject (c) ;
 			oos.writeObject (p) ;
 			oos.writeObject (r) ;
 			oos.flush () ;
@@ -66,7 +70,7 @@ public class BroadcastUpdates implements Serializable {
 		} catch (IOException e) {
 			e.printStackTrace () ;
 		}
-		System.out.println("SERVEUR : BroadcastUpdates : Fin envoi");
+		System.out.println("SERVEUR : BroadcastCreate : Fin envoi du message");
 	}
 
 	public int getPortDiffusion () throws RemoteException {

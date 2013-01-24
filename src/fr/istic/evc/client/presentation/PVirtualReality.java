@@ -2,26 +2,25 @@ package fr.istic.evc.client.presentation;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 
 import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Canvas3D;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
-import javax.swing.DefaultListSelectionModel;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
-import javax.swing.JList;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.vecmath.Point3d;
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
@@ -44,6 +43,7 @@ public class PVirtualReality extends JFrame {
 	private SimpleUniverse universe;
 	
 	private Canvas3D canvas3d;
+	private BranchGroup scene;
 	
 	// Buttons
 	private JButton rotateXPositiveBtn;
@@ -58,21 +58,29 @@ public class PVirtualReality extends JFrame {
 	private JButton moveDownBtn;
 	private JButton moveLeftBtn;
 	private JButton moveRightBtn;
-	private JButton createCube;
 	
+	// TextFields
 	private JTextField absPosX;
 	private JTextField absPosY;
 	private JTextField absPosZ;
-
 	private JTextField absRotX;
 	private JTextField absRotY;
 	private JTextField absRotZ;
 	
-	private JList listObjects;
-	private HashMap<String, PVirtualObject> objects;
-	@SuppressWarnings("unused")
-	private PVirtualObject[] selectedObjects;
-
+	// Création objet
+	private JTextField objName;
+	private JTextField objPosX;
+	private JTextField objPosY;
+	private JTextField objPosZ;
+	private JTextField objRotX;
+	private JTextField objRotY;
+	private JTextField objRotZ;
+	private JTextField objRot;
+	private JTextField objSize;
+	private JColorChooser objColors;
+	private JButton createCube;
+	
+	
 	public PVirtualReality(CVirtualRealityClient ctrl) {
 		super(FRAME_TITLE);
 		
@@ -83,6 +91,7 @@ public class PVirtualReality extends JFrame {
 		setLocationRelativeTo(null);
 		
 		this.initLayout();
+		this.initPanelCreation();
 		this.initListeners();
 	}
 	
@@ -95,12 +104,11 @@ public class PVirtualReality extends JFrame {
 		
 		canvas3d = new Canvas3D(config);
 		
-		@SuppressWarnings("unused")
-		BranchGroup scene = createSceneGraph();
+		scene = createSceneGraph();
 		
 		this.universe = new SimpleUniverse(canvas3d);
 		this.universe.getViewingPlatform().setNominalViewingTransform();
-		//this.universe.addBranchGraph(scene);
+		this.universe.addBranchGraph(scene);
 
 		JPanel leftPanel = new JPanel(new GridLayout(0, 1));
 		moveForwardBtn = new JButton("Move Forward");
@@ -109,7 +117,6 @@ public class PVirtualReality extends JFrame {
 		moveDownBtn = new JButton("Move Down");
 		moveLeftBtn = new JButton("Move Left");
 		moveRightBtn = new JButton("Move Right");
-		createCube = new JButton("Creer cube");
 		
 		leftPanel.add(moveForwardBtn);
 		leftPanel.add(moveBackwardBtn);
@@ -199,52 +206,77 @@ public class PVirtualReality extends JFrame {
 		bottomPanel.add(rotateYNegativeBtn);
 		bottomPanel.add(rotateZPositiveBtn);
 		bottomPanel.add(rotateZNegativeBtn);
-
-		JPanel rightPanel = new JPanel();
-		listObjects = new JList(objects.keySet().toArray());
-		listObjects.setSelectionModel(new DefaultListSelectionModel() {
-		    private static final long serialVersionUID = 1L;
-
-		    boolean gestureStarted = false;
-
-		    @Override
-		    public void setSelectionInterval(int index0, int index1) {
-		        if(!gestureStarted){
-		            if (isSelectedIndex(index0)) {
-		                super.removeSelectionInterval(index0, index1);
-		            } else {
-		                super.addSelectionInterval(index0, index1);
-		            }
-		        }
-		        gestureStarted = true;
-		    }
-
-		    @Override
-		    public void setValueIsAdjusting(boolean isAdjusting) {
-		        if (isAdjusting == false) {
-		            gestureStarted = false;
-		        }
-		    }
-
-		});
-		listObjects.addListSelectionListener(new ListSelectionListener() {
-			
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (!e.getValueIsAdjusting()) {
-					selectedObjects = (PVirtualObject[]) listObjects.getSelectedValues();
-				}
-			}
-		});
-		rightPanel.add(listObjects);
-		rightPanel.add(createCube);
 		
 		this.setLayout(new BorderLayout());
 		this.add(leftPanel, BorderLayout.WEST);
 		this.add(canvas3d, BorderLayout.CENTER);
 		this.add(bottomPanel, BorderLayout.SOUTH);
-		this.add(rightPanel, BorderLayout.EAST);
 		
+	}
+	
+	private void initPanelCreation() {
+		Dimension d = new Dimension( 200, 24 );
+		
+		objName = new JTextField();
+		objName.setPreferredSize(d);
+		objName.setMaximumSize(d);
+		
+		JPanel objPosPanel = new JPanel(new FlowLayout());
+		objPosX = new JTextField();
+		objPosY = new JTextField();
+		objPosZ = new JTextField();
+		objPosPanel.add(objPosX);
+		objPosPanel.add(objPosY);
+		objPosPanel.add(objPosZ);
+		objPosX.setText("0");
+		objPosY.setText("0");
+		objPosZ.setText("0");
+		objPosX.setColumns(3);
+		objPosY.setColumns(3);
+		objPosZ.setColumns(3);
+		
+		JPanel objRotPanel = new JPanel(new FlowLayout());
+		objRotX = new JTextField();
+		objRotY = new JTextField();
+		objRotZ = new JTextField();
+		objRot = new JTextField();
+		objRotPanel.add(objRotX);
+		objRotPanel.add(objRotY);
+		objRotPanel.add(objRotZ);
+		objRotPanel.add(objRot);
+		objRotX.setText("0");
+		objRotY.setText("0");
+		objRotZ.setText("0");
+		objRot.setText("0");
+		objRotX.setColumns(3);
+		objRotY.setColumns(3);
+		objRotZ.setColumns(3);
+		objRot.setColumns(3);
+		
+		objSize = new JTextField();
+		objSize.setPreferredSize(d);
+		objSize.setMaximumSize(d);
+		
+		objColors = new JColorChooser(Color.WHITE);
+		objColors.setPreviewPanel(new JPanel());
+
+		createCube = new JButton("Creer cube");
+		
+		JPanel rightPanel = new JPanel();
+		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+		rightPanel.add(new JLabel("Nom de l'objet : "));
+		rightPanel.add(objName);
+		rightPanel.add(new JLabel("Position: "));
+		rightPanel.add(objPosPanel);
+		rightPanel.add(new JLabel("Rotation: "));
+		rightPanel.add(objRotPanel);
+		rightPanel.add(new JLabel("Taille: "));
+		rightPanel.add(objSize);
+		rightPanel.add(new JLabel("Couleur : "));
+		rightPanel.add(objColors);
+		rightPanel.add(createCube);
+
+		this.add(rightPanel, BorderLayout.EAST);
 	}
 	
 	/**
@@ -328,8 +360,28 @@ public class PVirtualReality extends JFrame {
 		createCube.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				Color color = new Color(120, 90, 90);
-				controller.p2cCreateCube("objet", 0.1f, color, new Vector3d(), new Quat4d());
+				String n = objName.getText();
+				
+				if (!n.isEmpty()) {
+					Vector3d v = new Vector3d(
+							Double.valueOf(objPosX.getText()), 
+							Double.valueOf(objPosY.getText()), 
+							Double.valueOf(objPosZ.getText()));
+					Quat4d r = new Quat4d(
+							Double.valueOf(objRotX.getText()), 
+							Double.valueOf(objRotY.getText()),
+							Double.valueOf(objRotZ.getText()),
+							Double.valueOf(objRot.getText()));
+					
+					if ( Double.isNaN(r.x) || Double.isNaN(r.y) || Double.isNaN(r.z) || Double.isNaN(r.w)) {
+						r = new Quat4d();
+					}
+					
+					//controller.p2cCreateCube(n, Float.valueOf(objSize.getText()), objColors.getColor(), v, r);
+					
+					controller.p2cCreateCube(n, Float.valueOf(objSize.getText()), 
+							objColors.getColor(), v, r);
+				}
 			}
 		});
 	}
@@ -340,38 +392,7 @@ public class PVirtualReality extends JFrame {
 	 */
 	public BranchGroup createSceneGraph() {
 		BranchGroup objRoot = new BranchGroup();
-		this.objects = new HashMap<String, PVirtualObject>();
-		
-		/*Appearance a = new Appearance();
-		a.setColoringAttributes(new ColoringAttributes(0.2f, 0.1f, 0.1f, ColoringAttributes.FASTEST));
-		
-		// Cube 1
-		PVirtualObject cube = FactoryClient.newVirtualCube("Cube rouge", 0.2f, a).getPresentation();
-		cube.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		cube.setCapability(TransformGroup.ENABLE_PICK_REPORTING);
-		objRoot.addChild(cube);
-		objects.put("Cube rouge", cube);
-		
-		a = new Appearance();
-		a.setColoringAttributes(new ColoringAttributes(0.1f, 0.2f, 0.1f, ColoringAttributes.FASTEST));
-		
-		// Sphere 1
-		PVirtualObject sphere1 = FactoryClient.newVirtualSphere(0.1f, a).getPresentation();
-		sphere1.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		sphere1.setCapability(TransformGroup.ENABLE_PICK_REPORTING);
-		objRoot.addChild(sphere1);
-		objects.put("Sphere verte", sphere1);
-		
-		a = new Appearance();
-		a.setColoringAttributes(new ColoringAttributes(0.1f, 0.1f, 0.2f, ColoringAttributes.FASTEST));
-		
-		// Cube 2
-		PVirtualObject cube2 = FactoryClient.newVirtualCube(0.15f, a).getPresentation();
-		cube2.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		cube2.setCapability(TransformGroup.ENABLE_PICK_REPORTING);
-		objRoot.addChild(cube2);
-		objects.put("Cube bleu", cube2);
-		
+				
 		// Behaviour
 		objRoot.addChild(new PickRotateBehavior(objRoot, canvas3d, 
 				new BoundingSphere(new Point3d(0, 0, 0), 0.2)));
@@ -380,8 +401,10 @@ public class PVirtualReality extends JFrame {
 		objRoot.addChild(new PickZoomBehavior(objRoot, canvas3d, 
 				new BoundingSphere(new Point3d(0, 0, 0), 0.2)));
 		
+		objRoot.setCapability(BranchGroup.ALLOW_CHILDREN_EXTEND);
+		
 		// Compile
-		objRoot.compile();*/
+		objRoot.compile();
 		
 		return objRoot;
 	}
@@ -483,18 +506,9 @@ public class PVirtualReality extends JFrame {
 		
 		objRoot.addChild(object);
 		
-		// Behaviour
-		objRoot.addChild(new PickRotateBehavior(objRoot, canvas3d, 
-				new BoundingSphere(new Point3d(0, 0, 0), 0.2)));
-		objRoot.addChild(new PickTranslateBehavior(objRoot, canvas3d, 
-				new BoundingSphere(new Point3d(0, 0, 0), 0.2)));
-		objRoot.addChild(new PickZoomBehavior(objRoot, canvas3d, 
-				new BoundingSphere(new Point3d(0, 0, 0), 0.2)));
-		
 		objRoot.compile();
 		
-		this.universe.addBranchGraph(objRoot);
-		
-		objects.put("Objet", object);
+		//this.universe.addBranchGraph(objRoot);
+		this.scene.addChild(objRoot);
 	}
 }

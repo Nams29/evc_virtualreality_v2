@@ -1,5 +1,6 @@
 package fr.istic.evc.client;
 
+import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
@@ -11,16 +12,19 @@ import javax.vecmath.Vector3d;
 
 import fr.istic.evc.client.controller.CVirtualRealityClient;
 
-public class ReceiverUpdates extends Thread implements Runnable {
+public class ReceiverCreate extends Thread implements Runnable {
 
 	private transient MulticastSocket socketReception ;
 	private CVirtualRealityClient deportedClient ;
-	
+
+	private String name = new String () ;
 	private int id;
+	private float size;
+	private Color c;
 	private Vector3d pos = new Vector3d () ;
 	private Quat4d quat = new Quat4d () ;
 
-	public ReceiverUpdates (final String nomGroupe, final int portDiffusion) {
+	public ReceiverCreate (final String nomGroupe, final int portDiffusion) {
 		socketReception = null ;
 		try {
 			InetAddress adresseDiffusion = InetAddress.getByName (nomGroupe) ;
@@ -47,6 +51,9 @@ public class ReceiverUpdates extends Thread implements Runnable {
 			ObjectInputStream ois = new ObjectInputStream (bais) ;
 
 			id = (Integer)ois.readObject () ;
+			name = (String)ois.readObject () ;
+			size = (Float)ois.readObject () ;
+			c = (Color)ois.readObject () ;
 			pos = (Vector3d)ois.readObject () ;
 			quat = (Quat4d)ois.readObject () ;
 			
@@ -59,7 +66,7 @@ public class ReceiverUpdates extends Thread implements Runnable {
 	public void run () {
 		while (true) {
 			recevoir () ;
-			deportedClient.objectUpdateTransform(id, pos, quat) ;
+			deportedClient.objectCreateTransform(id, name,size,c, pos,quat) ;
 		}
 	}
 

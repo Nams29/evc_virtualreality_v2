@@ -81,5 +81,11 @@ public class VirtualObject implements IVirtualObjectServer {
 	public void setRotation(Quat4d rotation) {
 		this.rotation = rotation;
 	}
+
+	@Override
+	public void setATransform(Vector3d v, Quat4d q) {
+		this.setPosition(v);
+		this.setRotation(q);
+	}
 	
 }
