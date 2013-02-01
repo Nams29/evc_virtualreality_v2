@@ -31,7 +31,11 @@ public interface IVirtualObjectServer {
 	public abstract Quat4d getRotation() throws RemoteException;
 
 	public abstract void setRotation(Quat4d rotation) throws RemoteException;
-
+	
+	public String getShape() throws RemoteException;
+	
+	public void setShape(String shape) throws RemoteException;
+	
 	public abstract void setATransform(Vector3d v, Quat4d q) throws RemoteException;
 
 }

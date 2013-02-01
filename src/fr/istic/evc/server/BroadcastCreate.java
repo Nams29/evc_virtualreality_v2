@@ -46,7 +46,7 @@ public class BroadcastCreate implements Serializable {
 		System.out.println ("socket : " + socketDiffusion.getLocalPort() + " " + socketDiffusion.getInetAddress ()) ;
 	}
 
-	public void diffuseMessage (int id, String name, float size, Color c, Vector3d p, Quat4d r) {
+	public void diffuseMessage (int id, String name, float size, Color c, Vector3d p, Quat4d r, String s) {
 		System.out.println("SERVEUR : BroadcastCreate : Envoi du message");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream () ;
 		ObjectOutputStream oos ;
@@ -58,6 +58,7 @@ public class BroadcastCreate implements Serializable {
 			oos.writeObject (c) ;
 			oos.writeObject (p) ;
 			oos.writeObject (r) ;
+			oos.writeObject (s) ;
 			oos.flush () ;
 		} catch (IOException e) {
 			e.printStackTrace();

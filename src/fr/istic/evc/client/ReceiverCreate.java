@@ -23,6 +23,7 @@ public class ReceiverCreate extends Thread implements Runnable {
 	private Color c;
 	private Vector3d pos = new Vector3d () ;
 	private Quat4d quat = new Quat4d () ;
+	private String shape = new String();
 
 	public ReceiverCreate (final String nomGroupe, final int portDiffusion) {
 		socketReception = null ;
@@ -56,6 +57,7 @@ public class ReceiverCreate extends Thread implements Runnable {
 			c = (Color)ois.readObject () ;
 			pos = (Vector3d)ois.readObject () ;
 			quat = (Quat4d)ois.readObject () ;
+			shape = (String)ois.readObject();
 			
 		} catch (Exception e) {
 			e.printStackTrace () ;
@@ -66,7 +68,7 @@ public class ReceiverCreate extends Thread implements Runnable {
 	public void run () {
 		while (true) {
 			recevoir () ;
-			deportedClient.objectCreateTransform(id, name,size,c, pos,quat) ;
+			deportedClient.objectCreateTransform(id, name, size, c, pos, quat, shape) ;
 		}
 	}
 

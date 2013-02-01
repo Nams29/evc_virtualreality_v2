@@ -1,36 +1,25 @@
 package fr.istic.evc.server.controller;
 
 import java.awt.Color;
-import java.io.Serializable;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 
 import javax.vecmath.Quat4d;
 import javax.vecmath.Vector3d;
 
 import fr.istic.evc.server.BroadcastUpdates;
 import fr.istic.evc.server.abstraction.IVirtualObjectServer;
-import fr.istic.evc.server.abstraction.VirtualObject;
+import fr.istic.evc.server.abstraction.VirtualViewpoint;
 
-public class CVirtualObjectServer extends UnicastRemoteObject 
-	implements ICVirtualObjectServer, Serializable {
+public class CVirtualViewpointServer extends CVirtualObjectServer {
 	
 	private static final long serialVersionUID = -576878545016454955L;
 	
 	private IVirtualObjectServer abstraction;
-
-	protected BroadcastUpdates broadcast;
-	
-	protected String sharedObjectName;
-	protected String serverHostName = "127.0.0.1";
-	protected int serverRMIPort = 10001;
-	protected String nomGroupeUpdate = "239.11.7.91";
-	protected int portDiffusionUpdate = 10001;
-	
-	public CVirtualObjectServer(String name, float size, Color c, Vector3d pos, Quat4d rot, String shape) throws RemoteException {
-		System.out.println("SERVEUR : CVirtualObjectServer : Création cube");
-		this.abstraction = new VirtualObject(name, size, c, pos, rot, shape);
+		
+	public CVirtualViewpointServer(String name, float size, Color c, Vector3d pos, Quat4d rot, String shape) throws RemoteException {
+		super(name, size, c, pos, rot, shape);
+		this.abstraction = new VirtualViewpoint(name, size, c, pos, rot, shape);
 	}
 	
 	@Override
@@ -69,7 +58,6 @@ public class CVirtualObjectServer extends UnicastRemoteObject
 		
 		String nameBind = "//" + serverHostName + ":" + serverRMIPort + "/" + id;
 		
-		System.out.println("SERVEUR : CVirtualObjectServer : Bind sur "+nameBind);
 		this.broadcast = new BroadcastUpdates(nomGroupeUpdate, portDiffusionUpdate);
 		
 		try {
@@ -81,7 +69,6 @@ public class CVirtualObjectServer extends UnicastRemoteObject
 		} catch (Exception e) {
 			System.out.println ("pb RMICentralManager : "+e.getClass()+" : "+e.getMessage());
 		}
-		System.out.println("SERVEUR : CVirtualObjectServer : Fin bind");
 	}
 	
 	@Override
@@ -108,15 +95,9 @@ public class CVirtualObjectServer extends UnicastRemoteObject
 	public void setRotation(Quat4d rotation) throws RemoteException {
 		this.abstraction.setRotation(rotation);
 	}
-
-	@Override
-	public void answer(String string) throws RemoteException {
-		
-	}
 	
 	@Override
 	public void setTransform(Vector3d v, Quat4d q) throws RemoteException {
-		System.out.println("SERVEUR : CVirtualObjectServer : Réception message bougeage");
 		q.normalize();
 		this.abstraction.setATransform(v, q);
 		this.broadcast.diffuseMessage(this.getId(), v,q);

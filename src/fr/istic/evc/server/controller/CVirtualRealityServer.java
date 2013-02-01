@@ -48,9 +48,10 @@ public class CVirtualRealityServer extends UnicastRemoteObject implements ICVirt
 	}
 
 	@Override
-	public void c2cAddObject(String nom, float size, Color color, Vector3d pos, Quat4d rot) throws RemoteException {
+	public void c2cAddObject(String nom, float size, Color color, 
+			Vector3d pos, Quat4d rot, String shape) throws RemoteException {
 		System.out.println("SERVEUR : CVirtualReality : Réception message création cube");
-		CVirtualObjectServer object = FactoryServer.newVirtualCube(nom, size, color, pos, rot);
+		CVirtualObjectServer object = FactoryServer.newVirtualCube(nom, size, color, pos, rot, shape);
 		abstraction.addObject(object);
 
 		System.out.println("SERVEUR : CVirtualReality : Création cube terminée");
@@ -59,8 +60,18 @@ public class CVirtualRealityServer extends UnicastRemoteObject implements ICVirt
 		System.out.println("SERVEUR : CVirtualReality : "+object.getId()+ "\n "+ object.getName()+ "\n "+ 
 				 object.getSize()+ "\n "+ object.getColor()+"\n "+  object.getPosition()+"\n "+object.getRotation());
 		
-		this.broadcast.diffuseMessage(object.getId(), object.getName(), 
-				object.getSize(), object.getColor(), object.getPosition(), object.getRotation());
+		this.broadcast.diffuseMessage(object.getId(), object.getName(), object.getSize(), object.getColor(), 
+				object.getPosition(), object.getRotation(), object.getShape());
+	}
+	
+	@Override
+	public void c2cAddViewpoint(String nom, float size, Color color, 
+			Vector3d pos, Quat4d rot, String shape) throws RemoteException {
+		CVirtualViewpointServer object = FactoryServer.newVirtualViewpoint(nom, size, color, pos, rot, shape);
+		abstraction.addObject(object);
+		
+		this.broadcast.diffuseMessage(object.getId(), object.getName(), object.getSize(), 
+				object.getColor(), object.getPosition(), object.getRotation(), object.getShape());
 	}
 	
 	@Override

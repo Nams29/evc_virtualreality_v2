@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/j3d-1_5_2-linux-i586/lib/ext/j3dcore.jar"/>
 	<classpathentry kind="lib" path="lib/j3d-1_5_2-linux-i586/lib/ext/j3dutils.jar"/>
 	<classpathentry kind="lib" path="lib/j3d-1_5_2-linux-i586/lib/ext/vecmath.jar"/>
+	<classpathentry kind="lib" path="lib/j3d-vrml97.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

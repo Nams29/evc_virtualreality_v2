@@ -14,14 +14,13 @@ public class VirtualReality implements IVirtualRealityServer {
 	@Override
 	public void addObject(IVirtualObjectServer object) {
 		try {
-			System.out.println("SERVEUR : VirtualReality : Set Id Cube : "+listObjects.size());
+			System.out.println("SERVEUR : VirtualReality : Set Id objet : "+listObjects.size());
 			object.setId(listObjects.size());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 		
 		this.listObjects.add(object);
-		
 	}
 	
 	public ArrayList<IVirtualObjectServer> getList() {

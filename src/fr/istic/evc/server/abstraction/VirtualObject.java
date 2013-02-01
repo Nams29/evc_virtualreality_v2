@@ -7,19 +7,21 @@ import javax.vecmath.Vector3d;
 
 public class VirtualObject implements IVirtualObjectServer {
 	
-	private int id;
-	private String name;
-	private float size;
-	private Color color;
-	private Vector3d position;
-	private Quat4d rotation;
+	protected int id;
+	protected String name;
+	protected float size;
+	protected Color color;
+	protected Vector3d position;
+	protected Quat4d rotation;
+	protected String shape;
 	
-	public VirtualObject(String name, float size, Color c, Vector3d pos, Quat4d rot) {
+	public VirtualObject(String name, float size, Color c, Vector3d pos, Quat4d rot, String shape) {
 		this.name = name;
 		this.size = size;
 		this.color = c;
 		this.position = pos;
 		this.rotation = rot;
+		this.shape = shape;
 	}
 
 	@Override
@@ -80,6 +82,16 @@ public class VirtualObject implements IVirtualObjectServer {
 	@Override
 	public void setRotation(Quat4d rotation) {
 		this.rotation = rotation;
+	}
+
+	@Override
+	public String getShape() {
+		return shape;
+	}
+
+	@Override
+	public void setShape(String shape) {
+		this.shape = shape;
 	}
 
 	@Override

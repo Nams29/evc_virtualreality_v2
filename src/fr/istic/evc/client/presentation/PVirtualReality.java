@@ -69,6 +69,7 @@ public class PVirtualReality extends JFrame {
 	
 	// Création objet
 	private JTextField objName;
+	private JTextField objShape;
 	private JTextField objPosX;
 	private JTextField objPosY;
 	private JTextField objPosZ;
@@ -79,7 +80,6 @@ public class PVirtualReality extends JFrame {
 	private JTextField objSize;
 	private JColorChooser objColors;
 	private JButton createCube;
-	
 	
 	public PVirtualReality(CVirtualRealityClient ctrl) {
 		super(FRAME_TITLE);
@@ -221,6 +221,10 @@ public class PVirtualReality extends JFrame {
 		objName.setPreferredSize(d);
 		objName.setMaximumSize(d);
 		
+		objShape = new JTextField();
+		objShape.setPreferredSize(d);
+		objShape.setMaximumSize(d);
+		
 		JPanel objPosPanel = new JPanel(new FlowLayout());
 		objPosX = new JTextField();
 		objPosY = new JTextField();
@@ -256,6 +260,7 @@ public class PVirtualReality extends JFrame {
 		objSize = new JTextField();
 		objSize.setPreferredSize(d);
 		objSize.setMaximumSize(d);
+		objSize.setText("0.1");
 		
 		objColors = new JColorChooser(Color.WHITE);
 		objColors.setPreviewPanel(new JPanel());
@@ -266,6 +271,8 @@ public class PVirtualReality extends JFrame {
 		rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 		rightPanel.add(new JLabel("Nom de l'objet : "));
 		rightPanel.add(objName);
+		rightPanel.add(new JLabel("URL de la forme VRML : "));
+		rightPanel.add(objShape);
 		rightPanel.add(new JLabel("Position: "));
 		rightPanel.add(objPosPanel);
 		rightPanel.add(new JLabel("Rotation: "));
@@ -358,30 +365,9 @@ public class PVirtualReality extends JFrame {
 		});
 		
 		createCube.addActionListener(new ActionListener() {
-
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				String n = objName.getText();
-				
-				if (!n.isEmpty()) {
-					Vector3d v = new Vector3d(
-							Double.valueOf(objPosX.getText()), 
-							Double.valueOf(objPosY.getText()), 
-							Double.valueOf(objPosZ.getText()));
-					Quat4d r = new Quat4d(
-							Double.valueOf(objRotX.getText()), 
-							Double.valueOf(objRotY.getText()),
-							Double.valueOf(objRotZ.getText()),
-							Double.valueOf(objRot.getText()));
-					
-					if ( Double.isNaN(r.x) || Double.isNaN(r.y) || Double.isNaN(r.z) || Double.isNaN(r.w)) {
-						r = new Quat4d();
-					}
-					
-					//controller.p2cCreateCube(n, Float.valueOf(objSize.getText()), objColors.getColor(), v, r);
-					
-					controller.p2cCreateCube(n, Float.valueOf(objSize.getText()), 
-							objColors.getColor(), v, r);
-				}
+				createObject();
 			}
 		});
 	}
@@ -497,7 +483,13 @@ public class PVirtualReality extends JFrame {
 		
 		vpTrans.setTransform(t3d);
 	}
-
+	
+	public void c2pMoveViewpoint(Transform3D t) {
+		TransformGroup vpTrans = universe.getViewingPlatform().getViewPlatformTransform();
+		
+		vpTrans.setTransform(t);
+	}
+	
 	public void c2pCreateObject(PVirtualObject object) {
 		BranchGroup objRoot = new BranchGroup();
 		
@@ -510,5 +502,33 @@ public class PVirtualReality extends JFrame {
 		
 		//this.universe.addBranchGraph(objRoot);
 		this.scene.addChild(objRoot);
+	}
+	
+	private void createObject() {
+		String n = objName.getText();
+		
+		if (!n.isEmpty()) {
+			Vector3d v = new Vector3d(
+					Double.valueOf(objPosX.getText()), 
+					Double.valueOf(objPosY.getText()), 
+					Double.valueOf(objPosZ.getText()));
+			Quat4d r = new Quat4d(
+					Double.valueOf(objRotX.getText()), 
+					Double.valueOf(objRotY.getText()),
+					Double.valueOf(objRotZ.getText()),
+					Double.valueOf(objRot.getText()));
+			
+			if ( Double.isNaN(r.x) || Double.isNaN(r.y) || Double.isNaN(r.z) || Double.isNaN(r.w)) {
+				r = new Quat4d();
+			}
+			
+			r.normalize();
+			
+			String size = objSize.getText();
+			
+			if (size.isEmpty()) size = String.valueOf(0.1);
+			
+			controller.p2cCreateObject(n, Float.valueOf(size), objColors.getColor(), v, r, objShape.getText());
+		}
 	}
 }
